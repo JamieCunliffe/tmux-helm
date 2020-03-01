@@ -1,11 +1,22 @@
 use tmux_interface::TmuxInterface;
+use tmux_interface::clients_and_sessions::{SwitchClient, NewSession};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Session {
-    pub name: String
+    pub name: String,
+    pub new: bool,
 }
 
-pub fn get_sessions(/* tmux: &mut TmuxInterface */) -> Vec<Session> {
+impl Session {
+    pub fn new(name: String, new: bool) -> Session {
+        Session {
+            name: name,
+            new: new
+        }
+    }
+}
+
+pub fn get_sessions() -> Vec<Session> {
     let mut tmux = TmuxInterface::new();
     let sessions = match tmux.list_sessions(Some("#{session_name}")) {
         Ok(s) => s,
@@ -13,8 +24,31 @@ pub fn get_sessions(/* tmux: &mut TmuxInterface */) -> Vec<Session> {
     };
 
     sessions.lines().map(|x| {
-        Session {
-            name: x.to_string()
-        }
+        Session::new(x.to_string(), false)
     }).collect()
+}
+
+pub fn new_session(name: &String, attach: bool) {
+    let mut tmux = TmuxInterface::new();
+    let mut options = NewSession::new();
+    options.detached = Some(true);
+    options.session_name = Some(name.as_str());
+    match tmux.new_session(Some(&options)) {
+        Ok(_) => (),
+        Err(e) => eprintln!("{}", e)
+    }
+    if attach {
+        attach_session(name);
+    }
+}
+
+pub fn attach_session(name: &String) {
+    let mut tmux = TmuxInterface::new();
+    let mut options = SwitchClient::new();
+    options.target_session = Some(name.as_str());
+
+    match tmux.switch_client(Some(&options)) {
+        Ok(_) => eprintln!("attached"),
+        Err(e) => eprintln!("{}", e)
+    }
 }
