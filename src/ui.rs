@@ -1,5 +1,6 @@
 use super::event::Event;
 use super::tmux::*;
+use super::session::Session;
 
 use termion::event::Key;
 
@@ -26,6 +27,7 @@ impl UI {
         let mut state = ListState::default();
         state.select(Some(0));
         let sessions = get_sessions();
+
         UI {
             sessions: sessions.clone(),
             filtered_sessions: sessions.clone(),
@@ -50,7 +52,7 @@ impl UI {
             Text::styled("<C-j>", Style::new().fg(Color::Red)),
             Text::raw(" Switch/Create, "),
             Text::styled("<C-d>", Style::new().fg(Color::Red)),
-            Text::raw(" Delete")
+            Text::raw(" Delete"),
         ];
 
         let block = Block::default();
@@ -58,12 +60,7 @@ impl UI {
         f.render_widget(paragraph, chunks[0]);
 
         let sessions = self.filtered_sessions.iter().map(|x| {
-            let text = if x.new {
-                String::from(format!("NEW SESSION: {}", x.name))
-            } else {
-                x.name.clone()
-            };
-            Text::raw(text)
+            Text::raw(format!("{}", x))
         });
 
         let sessions = List::new(sessions)
@@ -132,6 +129,7 @@ impl UI {
                     }
                 })
                 .collect();
+
             self.filtered_sessions
                 .push(Session::new(String::from(&self.current_search), true));
         } else {

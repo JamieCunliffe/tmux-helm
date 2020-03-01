@@ -1,20 +1,7 @@
 use tmux_interface::TmuxInterface;
 use tmux_interface::clients_and_sessions::{SwitchClient, NewSession};
 
-#[derive(Debug, Clone)]
-pub struct Session {
-    pub name: String,
-    pub new: bool,
-}
-
-impl Session {
-    pub fn new(name: String, new: bool) -> Session {
-        Session {
-            name: name,
-            new: new
-        }
-    }
-}
+use super::session::Session;
 
 pub fn get_sessions() -> Vec<Session> {
     let mut tmux = TmuxInterface::new();

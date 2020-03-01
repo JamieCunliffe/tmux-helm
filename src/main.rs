@@ -11,10 +11,12 @@ use termion::raw::RawTerminal;
 use termion::screen::AlternateScreen;
 
 mod event;
-use self::event::*;
-mod ui;
-use self::ui::UI;
+mod session;
 mod tmux;
+mod ui;
+
+use self::event::*;
+use self::ui::UI;
 
 type TermType = tui::terminal::Terminal<
     TermionBackend<AlternateScreen<MouseTerminal<RawTerminal<std::io::Stdout>>>>,
