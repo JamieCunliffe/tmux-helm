@@ -1,37 +1,23 @@
 use super::event::Event;
-use super::tmux::*;
-use super::session::Session;
+use super::session_list::SessionList;
 
 use termion::event::Key;
 
 use tui::backend::Backend;
 use tui::layout::{Constraint, Layout};
-use tui::style::{Color, Modifier, Style};
-use tui::widgets::{Block, Borders, List, ListState, Paragraph, Text};
+use tui::style::{Color, Style};
+use tui::widgets::{Block, Paragraph, Text};
 use tui::Frame;
 
 pub struct UI {
-    sessions: Vec<Session>,
-    filtered_sessions: Vec<Session>,
-    session_state: ListState,
+    session_list: SessionList,
     current_search: String,
-}
-
-enum Action {
-    Select,
-    Delete,
 }
 
 impl UI {
     pub fn new() -> UI {
-        let mut state = ListState::default();
-        state.select(Some(0));
-        let sessions = get_sessions();
-
         UI {
-            sessions: sessions.clone(),
-            filtered_sessions: sessions.clone(),
-            session_state: state,
+            session_list: SessionList::new(),
             current_search: String::from(""),
         }
     }
@@ -59,16 +45,7 @@ impl UI {
         let paragraph = Paragraph::new(text.iter()).block(block).wrap(true);
         f.render_widget(paragraph, chunks[0]);
 
-        let sessions = self.filtered_sessions.iter().map(|x| {
-            Text::raw(format!("{}", x))
-        });
-
-        let sessions = List::new(sessions)
-            .block(Block::default().borders(Borders::ALL).title("Sessions"))
-            .highlight_style(Style::default().fg(Color::Yellow).modifier(Modifier::BOLD))
-            .highlight_symbol(">");
-
-        f.render_stateful_widget(sessions, chunks[1], &mut self.session_state);
+        self.session_list.draw(chunks[1], f);
 
         let search_text = [
             Text::styled("Prompt: ", Style::default().fg(Color::Cyan)),
@@ -81,89 +58,29 @@ impl UI {
     pub fn handle_event(&mut self, event: Event<Key>) -> bool {
         match event {
             Event::Input(key) => match key {
-                Key::Ctrl('p') => self.session_state.select(Some({
-                    let index = self.session_state.selected().unwrap();
-                    if index == 0 {
-                        self.filtered_sessions.len() - 1
-                    } else {
-                        index - 1
-                    }
-                })),
-                Key::Ctrl('n') => self.session_state.select(Some(
-                    (self.session_state.selected().unwrap() + 1) % self.filtered_sessions.len(),
-                )),
+                Key::Ctrl('p') => self.session_list.previous(),
+                Key::Ctrl('n') => self.session_list.next(),
                 Key::Ctrl('g') => return true,
-                Key::Ctrl('d') => self.do_selection(Action::Delete),
+                Key::Ctrl('d') => self.session_list.delete_session(),
 
                 Key::Char('\n') => {
-                    self.do_selection(Action::Select);
+                    self.session_list.select_session();
                     return true;
                 }
                 Key::Char(a) => {
                     self.current_search.push(a);
-                    self.filter_sessions();
+                    self.session_list.filter_sessions(&self.current_search);
                 }
                 Key::Backspace => {
                     if self.current_search.len() > 0 {
                         self.current_search.remove(self.current_search.len() - 1);
                     }
-                    self.filter_sessions();
+                    self.session_list.filter_sessions(&self.current_search);
                     ()
                 }
                 _ => (),
             },
         };
         false
-    }
-
-    fn filter_sessions(&mut self) {
-        if self.current_search.len() > 0 {
-            self.filtered_sessions = self
-                .sessions
-                .iter()
-                .filter_map(|x| {
-                    if x.name.contains(&self.current_search) {
-                        Some(x.clone())
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-
-            self.filtered_sessions
-                .push(Session::new(String::from(&self.current_search), true));
-        } else {
-            self.filtered_sessions = self.sessions.clone()
-        }
-
-        if self.filtered_sessions.len() > 0 {
-            self.session_state.select(Some(0));
-        } else {
-            self.session_state.select(None);
-        }
-    }
-
-    fn do_selection(&mut self, action: Action) {
-        if self.session_state.selected().is_some() {
-            let selected = self
-                .filtered_sessions
-                .get(self.session_state.selected().unwrap())
-                .unwrap();
-
-            match action {
-                Action::Select => {
-                    if selected.new {
-                        new_session(&selected.name, true);
-                    } else {
-                        attach_session(&selected.name);
-                    }
-                }
-                Action::Delete => {
-                    delete_session(&selected.name);
-                    self.sessions = get_sessions();
-                    self.filter_sessions();
-                }
-            }
-        }
     }
 }

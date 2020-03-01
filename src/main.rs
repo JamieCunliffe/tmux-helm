@@ -12,6 +12,7 @@ use termion::screen::AlternateScreen;
 
 mod event;
 mod session;
+mod session_list;
 mod tmux;
 mod ui;
 
