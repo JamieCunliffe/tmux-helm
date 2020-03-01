@@ -48,7 +48,15 @@ pub fn attach_session(name: &String) {
     options.target_session = Some(name.as_str());
 
     match tmux.switch_client(Some(&options)) {
-        Ok(_) => eprintln!("attached"),
+        Ok(_) => (),
         Err(e) => eprintln!("{}", e)
     }
+}
+
+pub fn delete_session(name: &String) {
+    let mut tmux = TmuxInterface::new();
+    match tmux.kill_session(None, None, Some(name.as_str())) {
+        Ok(_) => (),
+        Err(e) => eprintln!("{}", e)
+    };
 }

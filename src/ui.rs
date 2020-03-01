@@ -16,6 +16,11 @@ pub struct UI {
     current_search: String,
 }
 
+enum Action {
+    Select,
+    Delete,
+}
+
 impl UI {
     pub fn new() -> UI {
         let mut state = ListState::default();
@@ -43,7 +48,9 @@ impl UI {
 
         let text = [
             Text::styled("<C-j>", Style::new().fg(Color::Red)),
-            Text::raw(" Switch/Create"),
+            Text::raw(" Switch/Create, "),
+            Text::styled("<C-d>", Style::new().fg(Color::Red)),
+            Text::raw(" Delete")
         ];
 
         let block = Block::default();
@@ -77,7 +84,7 @@ impl UI {
     pub fn handle_event(&mut self, event: Event<Key>) -> bool {
         match event {
             Event::Input(key) => match key {
-                Key::Up => self.session_state.select(Some({
+                Key::Ctrl('p') => self.session_state.select(Some({
                     let index = self.session_state.selected().unwrap();
                     if index == 0 {
                         self.filtered_sessions.len() - 1
@@ -85,12 +92,14 @@ impl UI {
                         index - 1
                     }
                 })),
-                Key::Down => self.session_state.select(Some(
+                Key::Ctrl('n') => self.session_state.select(Some(
                     (self.session_state.selected().unwrap() + 1) % self.filtered_sessions.len(),
                 )),
                 Key::Ctrl('g') => return true,
+                Key::Ctrl('d') => self.do_selection(Action::Delete),
+
                 Key::Char('\n') => {
-                    self.do_selection();
+                    self.do_selection(Action::Select);
                     return true;
                 }
                 Key::Char(a) => {
@@ -136,15 +145,27 @@ impl UI {
         }
     }
 
-    fn do_selection(&self) {
-        let action = self
-            .filtered_sessions
-            .get(self.session_state.selected().unwrap())
-            .unwrap();
-        if action.new {
-            new_session(&action.name, true);
-        } else {
-            attach_session(&action.name);
+    fn do_selection(&mut self, action: Action) {
+        if self.session_state.selected().is_some() {
+            let selected = self
+                .filtered_sessions
+                .get(self.session_state.selected().unwrap())
+                .unwrap();
+
+            match action {
+                Action::Select => {
+                    if selected.new {
+                        new_session(&selected.name, true);
+                    } else {
+                        attach_session(&selected.name);
+                    }
+                }
+                Action::Delete => {
+                    delete_session(&selected.name);
+                    self.sessions = get_sessions();
+                    self.filter_sessions();
+                }
+            }
         }
     }
 }
