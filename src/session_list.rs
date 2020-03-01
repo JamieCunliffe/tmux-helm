@@ -1,6 +1,9 @@
 use super::session::Session;
 use super::tmux::*;
 
+use fuzzy_matcher::FuzzyMatcher;
+use fuzzy_matcher::skim::SkimMatcherV2;
+
 use tui::backend::Backend;
 use tui::layout::Rect;
 use tui::style::{Color, Modifier, Style};
@@ -49,15 +52,13 @@ impl SessionList {
 
     pub fn filter_sessions(&mut self, search: &String) {
         if search.len() > 0 {
+            let matcher = SkimMatcherV2::default();
             self.filtered_sessions = self
                 .sessions
                 .iter()
-                .filter_map(|x| {
-                    if x.name.contains(search) {
-                        Some(x.clone())
-                    } else {
-                        None
-                    }
+                .cloned()
+                .filter(|x| {
+                    matcher.fuzzy_match(&x.name, search).is_some()
                 })
                 .collect();
 
@@ -117,6 +118,7 @@ impl SessionList {
                 }
                 Action::Delete => {
                     delete_session(&selected.name);
+
                     self.sessions = get_sessions();
                     let last = self.last_search.clone();
                     self.filter_sessions(&last);
