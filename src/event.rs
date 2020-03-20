@@ -18,18 +18,25 @@ impl Events {
         let (tx, rx) = mpsc::channel();
         let _input_handle = {
             let tx = tx.clone();
+            info!("Spawning input thread");
             thread::spawn(move || {
+                info!("Input thread spawned");
                 let stdin = io::stdin();
                 for evt in stdin.keys() {
+                    info!("Event: {:?}", evt);
                     match evt {
                         Ok(key) => {
-                            if let Err(_) = tx.send(Event::Input(key)) {
+                            if let Err(e) = tx.send(Event::Input(key)) {
+                                error!("Failed to send input event: {:?}", e);
                                 return;
                             }
                         }
-                        Err(_) => {}
+                        Err(e) => {
+                            error!("Failed to read stdin keys, error: {:?}", e);
+                        }
                     }
                 }
+                error!("Input thread aborted");
             })
         };
         Events { rx }

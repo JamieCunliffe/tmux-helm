@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+
 use std::io;
 
 use std::error::Error;
@@ -34,11 +37,16 @@ fn setup() -> Result<TermType, Box<dyn Error>> {
 }
 
 fn main() {
+    pretty_env_logger::init();
+
     let events = Events::new();
 
     let mut terminal = match setup() {
         Ok(t) => t,
-        Err(_) => panic!("Failed to configure terminal"),
+        Err(e) => {
+            error!("Failed to configure terminal {:?}", e);
+            std::process::exit(1);
+        }
     };
 
     let mut app = UI::new();
@@ -46,7 +54,16 @@ fn main() {
         terminal
             .draw(|mut f| app.draw(&mut f))
             .expect("Failed to draw terminal");
-        if app.handle_event(events.next().unwrap()) {
+
+        let event = match events.next() {
+            Ok(e) => e,
+            Err(e) => {
+                error!("Failed to receive event, error: {:?}", e);
+                std::process::exit(2);
+            }
+        };
+
+        if app.handle_event(event) {
             break;
         }
     }

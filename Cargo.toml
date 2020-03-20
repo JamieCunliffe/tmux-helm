@@ -11,3 +11,5 @@ tmux_interface = "0.0.6"
 tui = { git = "https://github.com/fdehau/tui-rs" }
 termion = "1.5"
 fuzzy-matcher = "0.3.4"
+log = "0.4"
+pretty_env_logger = "0.4"
