@@ -9,6 +9,7 @@ use tui::layout::Rect;
 use tui::style::{Color, Modifier, Style};
 use tui::widgets::{Block, Borders, List, ListState, Text};
 use tui::Frame;
+use std::error::Error;
 
 enum Action {
     Select,
@@ -23,17 +24,17 @@ pub struct SessionList {
 }
 
 impl SessionList {
-    pub fn new() -> SessionList {
+    pub fn new() -> Result<SessionList, Box<dyn Error>> {
         let mut state = ListState::default();
         state.select(Some(0));
-        let sessions = get_sessions();
+        let sessions = get_sessions()?;
 
-        SessionList {
+        Ok(SessionList {
             sessions: sessions.clone(),
             filtered_sessions: sessions.clone(),
             session_state: state,
             last_search: String::from(""),
-        }
+        })
     }
 
     pub fn draw<B: Backend>(&mut self, region: Rect, f: &mut Frame<B>) {
@@ -77,12 +78,14 @@ impl SessionList {
         self.last_search = search.clone();
     }
 
-    pub fn select_session(&mut self) {
-        self.do_selection(Action::Select);
+    pub fn select_session(&mut self) -> Result<(), Box<dyn Error>> {
+        self.do_selection(Action::Select)?;
+        Ok(())
     }
 
-    pub fn delete_session(&mut self) {
-        self.do_selection(Action::Delete);
+    pub fn delete_session(&mut self) -> Result<(), Box<dyn Error>> {
+        self.do_selection(Action::Delete)?;
+        Ok(())
     }
 
     pub fn next(&mut self) {
@@ -101,7 +104,7 @@ impl SessionList {
         self.session_state.select(Some(selected));
     }
 
-    fn do_selection(&mut self, action: Action) {
+    fn do_selection(&mut self, action: Action) -> Result<(), Box<dyn Error>>{
         if self.session_state.selected().is_some() {
             let selected = self
                 .filtered_sessions
@@ -119,11 +122,12 @@ impl SessionList {
                 Action::Delete => {
                     delete_session(&selected.name);
 
-                    self.sessions = get_sessions();
+                    self.sessions = get_sessions()?;
                     let last = self.last_search.clone();
                     self.filter_sessions(&last);
                 }
             }
         }
+        Ok(())
     }
 }

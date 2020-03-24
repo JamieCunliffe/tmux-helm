@@ -50,7 +50,14 @@ fn main() {
         }
     };
 
-    let mut app = UI::new();
+    let mut app = match UI::new() {
+        Ok(a) => a,
+        Err(e) => {
+            error!("Failed to setup UI due to error: {}", e);
+            std::process::exit(3);
+        }
+    };
+
     loop {
         terminal
             .draw(|mut f| app.draw(&mut f))
@@ -64,7 +71,15 @@ fn main() {
             }
         };
 
-        if app.handle_event(event) {
+        let should_exit = match app.handle_event(event) {
+            Ok(r) => r,
+            Err(e) => {
+                error!("An error occurred while handling event, error: {}", e);
+                false
+            }
+        };
+
+        if should_exit {
             break;
         }
     }

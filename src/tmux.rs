@@ -1,30 +1,28 @@
 use super::session::Session;
 use super::session_manager::*;
-use std::iter::Iterator;
+use std::{error::Error, iter::Iterator};
 use tmux_interface::TmuxInterface;
 use tmux_interface::{
     clients_and_sessions::{NewSession, SwitchClient},
     NewWindow, SplitWindow,
 };
 
-pub fn get_sessions() -> Vec<Session> {
+pub fn get_sessions() -> Result<Vec<Session>, Box<dyn Error>> {
     let mut tmux = TmuxInterface::new();
-    let sessions = match tmux.list_sessions(Some("#{session_name}")) {
-        Ok(s) => s,
-        Err(_) => panic!("Couldn't list sessions"), // TODO: Handle the error better
-    };
+    let sessions = tmux.list_sessions(Some("#{session_name}"))?;
 
-    sessions
+    Ok(sessions
         .lines()
         .map(|x| Session::new(x.to_string(), false))
-        .collect()
+        .collect())
 }
 
 pub fn new_session(name: &String, attach: bool) {
     let mut tmux = TmuxInterface::new();
 
     if let Some(session) = read_session(name) {
-        debug!("Creating session from template: {:?}", session);
+        info!("Creating session from template: {:?}", session);
+
         let window = session.windows.first().unwrap();
         let wd = get_wd_path(&window.panes.first().unwrap().directory);
         create_session(&mut tmux, name, attach, Some(wd.as_str()));
@@ -36,6 +34,26 @@ pub fn new_session(name: &String, attach: bool) {
         create_session(&mut tmux, name, attach, None)
     }
 }
+
+pub fn attach_session(name: &String) {
+    let mut tmux = TmuxInterface::new();
+    let mut options = SwitchClient::new();
+    options.target_session = Some(name.as_str());
+
+    match tmux.switch_client(Some(&options)) {
+        Ok(_) => info!("Switched to session: {}", name),
+        Err(e) => error!("Failed to attach session due to error: {}", e),
+    }
+}
+
+pub fn delete_session(name: &String) {
+    let mut tmux = TmuxInterface::new();
+    match tmux.kill_session(None, None, Some(name.as_str())) {
+        Ok(_) => info!("Deleted session: {}", name),
+        Err(e) => error!("Failed to delete session due to error: {}", e),
+    };
+}
+
 
 fn create_session(tmux: &mut TmuxInterface, name: &String, attach: bool, cwd: Option<&str>) {
     let mut options = NewSession::new();
@@ -110,23 +128,4 @@ fn get_wd_path(path: &String) -> String {
             path.clone()
         }
     }
-}
-
-pub fn attach_session(name: &String) {
-    let mut tmux = TmuxInterface::new();
-    let mut options = SwitchClient::new();
-    options.target_session = Some(name.as_str());
-
-    match tmux.switch_client(Some(&options)) {
-        Ok(_) => info!("Switched to session: {}", name),
-        Err(e) => error!("Failed to attach session due to error: {}", e),
-    }
-}
-
-pub fn delete_session(name: &String) {
-    let mut tmux = TmuxInterface::new();
-    match tmux.kill_session(None, None, Some(name.as_str())) {
-        Ok(_) => info!("Deleted session: {}", name),
-        Err(e) => error!("Failed to delete session due to error: {}", e),
-    };
 }

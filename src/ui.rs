@@ -8,6 +8,7 @@ use tui::layout::{Constraint, Layout};
 use tui::style::{Color, Style};
 use tui::widgets::{Block, Paragraph, Text};
 use tui::Frame;
+use std::error::Error;
 
 pub struct UI {
     session_list: SessionList,
@@ -15,11 +16,11 @@ pub struct UI {
 }
 
 impl UI {
-    pub fn new() -> UI {
-        UI {
-            session_list: SessionList::new(),
+    pub fn new() -> Result<UI, Box<dyn Error>> {
+        Ok(UI {
+            session_list: SessionList::new()?,
             current_search: String::from(""),
-        }
+        })
     }
 
     pub fn draw<B: Backend>(&mut self, f: &mut Frame<B>) {
@@ -55,17 +56,17 @@ impl UI {
         f.render_widget(search_text, chunks[2]);
     }
 
-    pub fn handle_event(&mut self, event: Event<Key>) -> bool {
+    pub fn handle_event(&mut self, event: Event<Key>) -> Result<bool, Box<dyn Error>> {
         match event {
             Event::Input(key) => match key {
                 Key::Ctrl('p') => self.session_list.previous(),
                 Key::Ctrl('n') => self.session_list.next(),
-                Key::Ctrl('g') => return true,
-                Key::Ctrl('d') => self.session_list.delete_session(),
+                Key::Ctrl('g') => return Ok(true),
+                Key::Ctrl('d') => self.session_list.delete_session()?,
 
                 Key::Char('\n') => {
-                    self.session_list.select_session();
-                    return true;
+                    self.session_list.select_session()?;
+                    return Ok(true);
                 }
                 Key::Char(a) => {
                     self.current_search.push(a);
@@ -81,6 +82,6 @@ impl UI {
                 _ => (),
             },
         };
-        false
+        Ok(false)
     }
 }
