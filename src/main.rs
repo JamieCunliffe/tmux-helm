@@ -18,6 +18,7 @@ mod session;
 mod session_list;
 mod tmux;
 mod ui;
+mod session_manager;
 
 use self::event::*;
 use self::ui::UI;
