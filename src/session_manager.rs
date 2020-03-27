@@ -41,7 +41,13 @@ impl Display for Pane {
 pub fn read_session(session_name: &String) -> Option<Session> {
     debug!("Reading sessions");
 
-    let contents = std::fs::read_to_string("sessions/config.json").unwrap();
+    let contents = match std::fs::read_to_string("sessions/config.json") {
+        Ok(a) => a,
+        Err(e) => {
+            error!("Error reading config file: {}", e);
+            return None;
+        }
+    };
     let session: Root = serde_json::from_str(&contents).unwrap();
 
     match session.session.iter().find(|x| &x.name == session_name) {

@@ -20,18 +20,21 @@ pub fn get_sessions() -> Result<Vec<Session>, Box<dyn Error>> {
 pub fn new_session(name: &String, attach: bool) {
     let mut tmux = TmuxInterface::new();
 
-    if let Some(session) = read_session(name) {
-        info!("Creating session from template: {:?}", session);
+    match read_session(name) {
+        Some(session) => {
+            info!("Creating session from template: {:?}", session);
 
-        let window = session.windows.first().unwrap();
-        let wd = get_wd_path(&window.panes.first().unwrap().directory);
-        create_session(&mut tmux, name, attach, Some(wd.as_str()));
-        setup_panes(&mut tmux, &name, window.panes.iter().skip(1));
-        for window in session.windows.iter().skip(1) {
-            create_window(&mut tmux, name, &window);
+            let window = session.windows.first().unwrap();
+            let wd = get_wd_path(&window.panes.first().unwrap().directory);
+            create_session(&mut tmux, name, attach, Some(wd.as_str()));
+
+            setup_panes(&mut tmux, &name, window.panes.iter().skip(1));
+
+            for window in session.windows.iter().skip(1) {
+                create_window(&mut tmux, name, &window);
+            }
         }
-    } else {
-        create_session(&mut tmux, name, attach, None)
+        None => create_session(&mut tmux, name, attach, None),
     }
 }
 
@@ -53,7 +56,6 @@ pub fn delete_session(name: &String) {
         Err(e) => error!("Failed to delete session due to error: {}", e),
     };
 }
-
 
 fn create_session(tmux: &mut TmuxInterface, name: &String, attach: bool, cwd: Option<&str>) {
     let mut options = NewSession::new();
