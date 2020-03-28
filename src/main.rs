@@ -13,6 +13,8 @@ use termion::raw::IntoRawMode;
 use termion::raw::RawTerminal;
 use termion::screen::AlternateScreen;
 
+mod config;
+mod utils;
 mod event;
 mod session;
 mod session_list;

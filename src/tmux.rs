@@ -7,6 +7,8 @@ use tmux_interface::{
     NewWindow, SplitWindow,
 };
 
+use crate::utils::expand_path;
+
 pub fn get_sessions() -> Result<Vec<Session>, Box<dyn Error>> {
     let mut tmux = TmuxInterface::new();
     let sessions = tmux.list_sessions(Some("#{session_name}"))?;
@@ -25,7 +27,7 @@ pub fn new_session(name: &String, attach: bool) {
             info!("Creating session from template: {:?}", session);
 
             let window = session.windows.first().unwrap();
-            let wd = get_wd_path(&window.panes.first().unwrap().directory);
+            let wd = expand_path(&window.panes.first().unwrap().directory);
             create_session(&mut tmux, name, attach, Some(wd.as_str()));
 
             setup_panes(&mut tmux, &name, window.panes.iter().skip(1));
@@ -76,7 +78,7 @@ fn create_window(tmux: &mut TmuxInterface, session: &String, window: &Window) {
     let session = format!("{}:", session);
 
     let first_pane = window.panes.first().unwrap();
-    let wd = get_wd_path(&first_pane.directory);
+    let wd = expand_path(&first_pane.directory);
     let mut new_window = NewWindow::new();
     new_window.cwd = Some(wd.as_str());
     new_window.target_window = Some(&session);
@@ -95,7 +97,7 @@ where
     I: Iterator<Item = &'a Pane>,
 {
     for pane in panes {
-        let wd = get_wd_path(&pane.directory);
+        let wd = expand_path(&pane.directory);
         let mut split_window = SplitWindow::new();
         split_window.cwd = Some(wd.as_str());
         split_window.target_pane = Some(&session);
@@ -113,21 +115,5 @@ where
             Ok(_) => info!("Created pane split for configuration: {}", pane),
             Err(e) => error!("Failed to split window due to error: {}", e),
         };
-    }
-}
-
-fn get_wd_path(path: &String) -> String {
-    match shellexpand::full(path.as_str()) {
-        Ok(s) => {
-            debug!("Expanded path: {}, to {}", path, s);
-            s.into_owned()
-        }
-        Err(e) => {
-            warn!(
-                "Failed to perform shell expansion on path: {}, error {}",
-                path, e
-            );
-            path.clone()
-        }
     }
 }

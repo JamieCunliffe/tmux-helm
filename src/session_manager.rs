@@ -40,18 +40,29 @@ impl Display for Pane {
 
 pub fn read_session(session_name: &String) -> Option<Session> {
     debug!("Reading sessions");
-
-    let contents = match std::fs::read_to_string("sessions/config.json") {
-        Ok(a) => a,
+    let config = match super::config::get_config() {
+        Ok(c) => c,
         Err(e) => {
-            error!("Error reading config file: {}", e);
+            info!("Error reading configuration file: {}", e);
             return None;
         }
     };
-    let session: Root = serde_json::from_str(&contents).unwrap();
 
-    match session.session.iter().find(|x| &x.name == session_name) {
-        Some(s) => Some(s.clone()),
-        None => None,
+    for session_file in config.session_files {
+        let contents = match std::fs::read_to_string(&session_file) {
+            Ok(a) => a,
+            Err(e) => {
+                error!("Error reading session file ({}) : {}", session_file, e);
+                return None;
+            }
+        };
+        let session: Root = serde_json::from_str(&contents).unwrap();
+
+        match session.session.iter().find(|x| &x.name == session_name) {
+            Some(s) => return Some(s.clone()),
+            None => (),
+        };
     }
+
+    None
 }
