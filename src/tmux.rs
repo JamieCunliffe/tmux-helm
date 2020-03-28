@@ -102,14 +102,11 @@ where
         split_window.cwd = Some(wd.as_str());
         split_window.target_pane = Some(&session);
 
-        match &pane.split {
-            Some(s) => match s.as_str() {
-                "vertical" => split_window.horizontal = Some(false),
-                "horizontal" => split_window.horizontal = Some(true),
-                _ => warn!("Invalid value {} for split", s),
-            },
-            None => split_window.horizontal = Some(false),
+        match pane.split {
+            Split::Vertical => split_window.horizontal = Some(false),
+            Split::Horizontal => split_window.horizontal = Some(true)
         };
+
         debug!("split window opts: {:?}", split_window);
         match tmux.split_window(Some(&split_window)) {
             Ok(_) => info!("Created pane split for configuration: {}", pane),

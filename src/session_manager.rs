@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
+
 #[derive(Debug, Serialize, Deserialize)]
 struct Root {
     session: Vec<Session>,
@@ -20,20 +21,41 @@ pub struct Window {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Pane {
+    #[serde(default = "default_dir")]
     pub directory: String,
-    pub split: Option<String>,
+    #[serde(default = "default_split")]
+    pub split: Split,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum Split {
+    #[serde(rename = "vertical")]
+    Vertical,
+    #[serde(rename = "horizontal")]
+    Horizontal,
 }
 
 impl Display for Pane {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
-        write!(f, "Pane configuration:\n\tDirectory: {}\n\tSplit: {}", self.directory, match &self.split {
-            Some(s) => match s.as_str() {
-                "vertical" => "vertical",
-                "horizontal" => "horizontal",
-                _ => "UNKNOWN"
+        write!(
+            f,
+            r#"Pane configuraxtion:
+	Directory: {}
+	Split: {}"#,
+            self.directory, self.split
+        )
+    }
+}
+
+impl Display for Split {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            match self {
+                Split::Vertical => "vertical",
+                Split::Horizontal => "horizontal",
             }
-            None => "vertical"
-        }
         )
     }
 }
@@ -65,4 +87,12 @@ pub fn read_session(session_name: &String) -> Option<Session> {
     }
 
     None
+}
+
+pub fn default_dir() -> String {
+    String::from("~/")
+}
+
+pub fn default_split() -> Split {
+    Split::Vertical
 }
