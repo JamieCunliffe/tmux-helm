@@ -10,8 +10,9 @@ use tmux_interface::{
 use crate::utils::expand_path;
 
 pub fn get_sessions() -> Result<Vec<Session>, Box<dyn Error>> {
+    let config = super::config::get_config();
     let mut tmux = TmuxInterface::new();
-    let sessions = tmux.list_sessions(Some("#{session_name}"))?;
+    let sessions = tmux.list_sessions(Some(&config.session_format))?;
 
     Ok(sessions
         .lines()

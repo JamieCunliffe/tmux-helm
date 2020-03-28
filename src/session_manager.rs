@@ -62,13 +62,7 @@ impl Display for Split {
 
 pub fn read_session(session_name: &String) -> Option<Session> {
     debug!("Reading sessions");
-    let config = match super::config::get_config() {
-        Ok(c) => c,
-        Err(e) => {
-            info!("Error reading configuration file: {}", e);
-            return None;
-        }
-    };
+    let config = super::config::get_config();
 
     for session_file in config.session_files {
         let contents = match std::fs::read_to_string(&session_file) {

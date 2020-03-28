@@ -7,8 +7,18 @@ use std::fs::read_to_string;
 #[derive(Deserialize, Debug)]
 pub struct Config {
     pub session_files: Vec<String>,
+    #[serde(default = "default_session_format")]
+    pub session_format: String,
 }
 
+impl Default for Config {
+    fn default() -> Self {
+        Config {
+            session_files: vec![],
+            session_format: default_session_format()
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct ConfigFileError { }
@@ -28,7 +38,17 @@ impl Error for ConfigFileError {
     }
 }
 
-pub fn get_config() -> Result<Config, Box<dyn Error>> {
+pub fn get_config() -> Config {
+    match get_config_internal() {
+        Ok(c) => c,
+        Err(e) => {
+            warn!("Failed to load config due to error: {}", e);
+            Config::default()
+        }
+    }
+}
+
+fn get_config_internal() -> Result<Config, Box<dyn Error>> {
     let xdg = xdg::BaseDirectories::with_prefix("tmux-session")?;
     let config_file = match xdg.find_config_file("config.toml") {
         Some(f) => f.as_path().to_str().unwrap_or("").to_string(),
@@ -50,4 +70,8 @@ pub fn get_config() -> Result<Config, Box<dyn Error>> {
 
     debug!("Config: {:?}", config);
     Ok(config)
+}
+
+pub fn default_session_format() -> String {
+    String::from("#{session_name}")
 }
