@@ -29,7 +29,13 @@ pub fn new_session(name: &String, attach: bool) {
 
             let window = session.windows.first().unwrap();
             let wd = expand_path(&window.panes.first().unwrap().directory);
-            create_session(&mut tmux, name, attach, Some(wd.as_str()));
+            create_session(
+                &mut tmux,
+                name,
+                attach,
+                Some(wd.as_str()),
+                window.name.as_ref().map(|x| &**x),
+            );
 
             setup_panes(&mut tmux, &name, window.panes.iter().skip(1));
 
@@ -37,7 +43,7 @@ pub fn new_session(name: &String, attach: bool) {
                 create_window(&mut tmux, name, &window);
             }
         }
-        None => create_session(&mut tmux, name, attach, None),
+        None => create_session(&mut tmux, name, attach, None, None),
     }
 }
 
@@ -60,11 +66,18 @@ pub fn delete_session(name: &String) {
     };
 }
 
-fn create_session(tmux: &mut TmuxInterface, name: &String, attach: bool, cwd: Option<&str>) {
+fn create_session(
+    tmux: &mut TmuxInterface,
+    name: &String,
+    attach: bool,
+    cwd: Option<&str>,
+    window_name: Option<&str>,
+) {
     let mut options = NewSession::new();
     options.detached = Some(true);
     options.session_name = Some(name.as_str());
     options.cwd = cwd;
+    options.window_name = window_name;
 
     match tmux.new_session(Some(&options)) {
         Ok(_) => info!("Created new session: {}", name),
@@ -83,6 +96,7 @@ fn create_window(tmux: &mut TmuxInterface, session: &String, window: &Window) {
     let mut new_window = NewWindow::new();
     new_window.cwd = Some(wd.as_str());
     new_window.target_window = Some(&session);
+    new_window.window_name = window.name.as_ref().map(|x| &**x);
 
     debug!("New window opts: {:?}", new_window);
     match tmux.new_window(Some(&new_window)) {
@@ -105,7 +119,7 @@ where
 
         match pane.split {
             Split::Vertical => split_window.horizontal = Some(false),
-            Split::Horizontal => split_window.horizontal = Some(true)
+            Split::Horizontal => split_window.horizontal = Some(true),
         };
 
         debug!("split window opts: {:?}", split_window);

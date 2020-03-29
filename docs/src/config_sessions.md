@@ -9,9 +9,10 @@
 
 ## Window
 
-| Field | Required | Possible Values        | Default | Description                            |
-|-------|----------|------------------------|---------|----------------------------------------|
-| pane  | True     | A list of pane objects | True    | The panes to be created in this window |
+| Field | Required | Possible Values        | Default | Description                                                                                    |
+|-------|----------|------------------------|---------|------------------------------------------------------------------------------------------------|
+| pane  | True     | A list of pane objects | True    | The panes to be created in this window                                                         |
+| name  | False    | A valid window name    | No name | The name to set the window to when creating it, this will appear in the tmux window status bar |
 
 
 ## Pane
