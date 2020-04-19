@@ -349,7 +349,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tmux-session"
+name = "tmux-helm"
 version = "0.1.0"
 dependencies = [
  "fuzzy-matcher 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",

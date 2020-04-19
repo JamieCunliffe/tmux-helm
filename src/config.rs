@@ -49,7 +49,7 @@ pub fn get_config() -> Config {
 }
 
 fn get_config_internal() -> Result<Config, Box<dyn Error>> {
-    let xdg = xdg::BaseDirectories::with_prefix("tmux-session")?;
+    let xdg = xdg::BaseDirectories::with_prefix("tmux-helm")?;
     let config_file = match xdg.find_config_file("config.toml") {
         Some(f) => f.as_path().to_str().unwrap_or("").to_string(),
         None => {

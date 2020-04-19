@@ -1,6 +1,6 @@
 # Configuration
 
-The main configuration file follows XDG config specification and lives under the prefix tmux-session with a filename of config.toml (e.g. ~/.config/tmux-session/config.toml)
+The main configuration file follows XDG config specification and lives under the prefix tmux-helm with a filename of config.toml (e.g. ~/.config/tmux-helm/config.toml)
 
 The following can be configured:
 

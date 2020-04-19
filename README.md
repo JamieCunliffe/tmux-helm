@@ -7,6 +7,5 @@ cargo build --release
 
 After the binary has been built you should then launch it from your tmux config, I use the following
 ```
-bind-key b new-window "${HOME}/projects/tmux-session/run.sh"
+bind-key b new-window "/path/to/tmux-helm/run.sh"
 ```
-Using run-shell has some issues with the tty, if anyone knows the solution for those please raise an issue.
