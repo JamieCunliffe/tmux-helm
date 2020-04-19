@@ -2,4 +2,4 @@
 authors = ["Jamie Cunliffe"]
 language = "en"
 multilingual = false
-src = "src"
+src = "docs/src"
