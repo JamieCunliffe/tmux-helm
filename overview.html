@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Sessions</title>
+        <title>Overview</title>
         
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="keybindings.html"><strong aria-hidden="true">2.</strong> Keybindings</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">3.</strong> Config</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config_sessions.html" class="active"><strong aria-hidden="true">3.1.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="config_theme.html"><strong aria-hidden="true">3.2.</strong> Theme</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html" class="active"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="keybindings.html"><strong aria-hidden="true">2.</strong> Keybindings</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">3.</strong> Config</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config_sessions.html"><strong aria-hidden="true">3.1.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="config_theme.html"><strong aria-hidden="true">3.2.</strong> Theme</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -147,62 +147,19 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#session-manager" id="session-manager">Session Manager</a></h1>
-<h2><a class="header" href="#session" id="session">Session</a></h2>
-<table><thead><tr><th>Field</th><th>Required</th><th>Possible Values</th><th>Default</th><th>Description</th></tr></thead><tbody>
-<tr><td>name</td><td>True</td><td>A tmux session name</td><td>N/A</td><td>The name of the session, when a new session is to be created when this n</td></tr>
-<tr><td>windows</td><td>True</td><td>A list window objects (See Window section below)</td><td>N/A</td><td>The windows to be created inside this session</td></tr>
-</tbody></table>
-<h2><a class="header" href="#window" id="window">Window</a></h2>
-<table><thead><tr><th>Field</th><th>Required</th><th>Possible Values</th><th>Default</th><th>Description</th></tr></thead><tbody>
-<tr><td>pane</td><td>True</td><td>A list of pane objects</td><td>True</td><td>The panes to be created in this window</td></tr>
-<tr><td>name</td><td>False</td><td>A valid window name</td><td>No name</td><td>The name to set the window to when creating it, this will appear in the tmux window status bar</td></tr>
-</tbody></table>
-<h2><a class="header" href="#pane" id="pane">Pane</a></h2>
-<table><thead><tr><th>Field</th><th>Required</th><th>Possible Values</th><th>Default</th><th>Description</th></tr></thead><tbody>
-<tr><td>directory</td><td>False</td><td>Any path</td><td>~/</td><td>The working director</td></tr>
-<tr><td>split</td><td>False</td><td>vertical,horizontal</td><td>vertical</td><td>How to split the pane</td></tr>
-</tbody></table>
-<h2><a class="header" href="#example" id="example">Example</a></h2>
-<pre><code>{
-  &quot;session&quot;: [
-    {
-      &quot;name&quot;: &quot;config&quot;,
-      &quot;windows&quot;: [
-        {
-          &quot;panes&quot;: [
-            {
-              &quot;directory&quot;: &quot;~/&quot;
-            },
-            {
-              &quot;split&quot;: &quot;vertical&quot;,
-              &quot;directory&quot;: &quot;~/.cfg/&quot;
-            },
-            {
-              &quot;split&quot;: &quot;horizontal&quot;,
-              &quot;directory&quot;: &quot;~/.config/zsh/&quot;
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-
-</code></pre>
+                        <h1><a class="header" href="#overview" id="overview">Overview</a></h1>
+<p>This is a simple project that allows tmux sessions to be switched, along with created and deleted from the same screen.
+Fuzzy searching can be used for filtering the list of sessions, also it will allow a session to be created from the text that has been entered.</p>
+<p>If the session name that's being created matches a user defined template then a session will be created based on that template see the configuration for more information.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="config.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                                <i class="fa fa-angle-left"></i>
-                            </a>
-                        
 
                         
-                            <a rel="next" href="config_theme.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="keybindings.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -214,13 +171,9 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="config.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                        <i class="fa fa-angle-left"></i>
-                    </a>
-                
 
                 
-                    <a rel="next" href="config_theme.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="keybindings.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

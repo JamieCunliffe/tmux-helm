@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="config.html" class="active"><strong aria-hidden="true">1.</strong> Config</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config_sessions.html"><strong aria-hidden="true">1.1.</strong> Sessions</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="keybindings.html"><strong aria-hidden="true">2.</strong> Keybindings</a></li><li class="chapter-item expanded "><a href="config.html" class="active"><strong aria-hidden="true">3.</strong> Config</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config_sessions.html"><strong aria-hidden="true">3.1.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="config_theme.html"><strong aria-hidden="true">3.2.</strong> Theme</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -154,11 +154,27 @@
 <tr><td>session_files</td><td>False</td><td>List of file paths</td><td>None</td><td>A list of paths to session configuration files that should be checked when creating a new session, see <a href="./config_sessions.html">here</a> for more details</td></tr>
 <tr><td>session_format</td><td>False</td><td>A valid tmux display-message string</td><td>#{session_name}</td><td>The format string to display the sessions as in the session list</td></tr>
 </tbody></table>
+<p>An example config file might look something like this:</p>
+<pre><code>session_files = [ &quot;~/.config/tmux-helm/sessions/config.json&quot; ]
+session_format = &quot;#{session_name}&quot;
+
+[theme]
+selected_session_foreground = 0xFFFF00
+session_foreground = 0xFFFFFF
+session_list_border = 0xAAAAAA
+help_binding_foreground = 0xFFFFFF
+prompt_foreground = 0xFFFFFF
+prompt_input_foreground = 0xAAAAAA
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="keybindings.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
                         
 
                         
@@ -173,6 +189,10 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="keybindings.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
                 
 
                 

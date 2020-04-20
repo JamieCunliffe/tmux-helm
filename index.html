@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Config</title>
+        <title>Overview</title>
         
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">1.</strong> Config</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config_sessions.html"><strong aria-hidden="true">1.1.</strong> Sessions</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="keybindings.html"><strong aria-hidden="true">2.</strong> Keybindings</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">3.</strong> Config</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config_sessions.html"><strong aria-hidden="true">3.1.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="config_theme.html"><strong aria-hidden="true">3.2.</strong> Theme</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -147,13 +147,10 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#configuration" id="configuration">Configuration</a></h1>
-<p>The main configuration file follows XDG config specification and lives under the prefix tmux-helm with a filename of config.toml (e.g. ~/.config/tmux-helm/config.toml)</p>
-<p>The following can be configured:</p>
-<table><thead><tr><th>Field</th><th>Required</th><th>Possible Values</th><th>Default</th><th>Description</th></tr></thead><tbody>
-<tr><td>session_files</td><td>False</td><td>List of file paths</td><td>None</td><td>A list of paths to session configuration files that should be checked when creating a new session, see <a href="./config_sessions.html">here</a> for more details</td></tr>
-<tr><td>session_format</td><td>False</td><td>A valid tmux display-message string</td><td>#{session_name}</td><td>The format string to display the sessions as in the session list</td></tr>
-</tbody></table>
+                        <h1><a class="header" href="#overview" id="overview">Overview</a></h1>
+<p>This is a simple project that allows tmux sessions to be switched, along with created and deleted from the same screen.
+Fuzzy searching can be used for filtering the list of sessions, also it will allow a session to be created from the text that has been entered.</p>
+<p>If the session name that's being created matches a user defined template then a session will be created based on that template see the configuration for more information.</p>
 
                     </main>
 
@@ -162,7 +159,7 @@
                         
 
                         
-                            <a rel="next" href="config_sessions.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="keybindings.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -176,7 +173,7 @@
                 
 
                 
-                    <a rel="next" href="config_sessions.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="keybindings.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
