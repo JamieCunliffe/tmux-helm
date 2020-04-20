@@ -7,10 +7,9 @@ use tmux_interface::{
     NewWindow, SplitWindow,
 };
 
-use crate::utils::expand_path;
+use crate::{config::Config, utils::expand_path};
 
-pub fn get_sessions() -> Result<Vec<Session>, Box<dyn Error>> {
-    let config = super::config::get_config();
+pub fn get_sessions(config: &Config) -> Result<Vec<Session>, Box<dyn Error>> {
     let mut tmux = TmuxInterface::new();
     let sessions = tmux.list_sessions(Some(&config.session_format))?;
 
@@ -20,10 +19,10 @@ pub fn get_sessions() -> Result<Vec<Session>, Box<dyn Error>> {
         .collect())
 }
 
-pub fn new_session(name: &String, attach: bool) {
+pub fn new_session(name: &String, attach: bool, config: &Config) {
     let mut tmux = TmuxInterface::new();
 
-    match read_session(name) {
+    match read_session(name, config) {
         Some(session) => {
             info!("Creating session from template: {:?}", session);
 

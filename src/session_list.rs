@@ -1,39 +1,42 @@
 use super::session::Session;
 use super::tmux::*;
+use crate::config::Config;
 
-use fuzzy_matcher::FuzzyMatcher;
 use fuzzy_matcher::skim::SkimMatcherV2;
+use fuzzy_matcher::FuzzyMatcher;
 
+use std::error::Error;
 use tui::backend::Backend;
 use tui::layout::Rect;
-use tui::style::{Color, Modifier, Style};
+use tui::style::{Modifier, Style};
 use tui::widgets::{Block, Borders, List, ListState, Text};
 use tui::Frame;
-use std::error::Error;
 
 enum Action {
     Select,
     Delete,
 }
 
-pub struct SessionList {
+pub struct SessionList<'a> {
     sessions: Vec<Session>,
     filtered_sessions: Vec<Session>,
     session_state: ListState,
     last_search: String,
+    config: &'a Config,
 }
 
-impl SessionList {
-    pub fn new() -> Result<SessionList, Box<dyn Error>> {
+impl SessionList<'_> {
+    pub fn new<'a>(config: &'a Config) -> Result<SessionList<'a>, Box<dyn Error>> {
         let mut state = ListState::default();
         state.select(Some(0));
-        let sessions = get_sessions()?;
+        let sessions = get_sessions(&config)?;
 
         Ok(SessionList {
             sessions: sessions.clone(),
             filtered_sessions: sessions.clone(),
             session_state: state,
             last_search: String::from(""),
+            config,
         })
     }
 
@@ -44,8 +47,19 @@ impl SessionList {
             .map(|x| Text::raw(format!("{}", x)));
 
         let sessions = List::new(sessions)
-            .block(Block::default().borders(Borders::ALL).title("Sessions"))
-            .highlight_style(Style::default().fg(Color::Yellow).modifier(Modifier::BOLD))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title("Sessions")
+                    .title_style(Style::default().fg(self.config.theme.get_session_list_border()))
+                    .border_style(Style::default().fg(self.config.theme.get_session_list_border())),
+            )
+            .style(Style::default().fg(self.config.theme.get_session_foreground()))
+            .highlight_style(
+                Style::default()
+                    .fg(self.config.theme.get_highlight_foreground())
+                    .modifier(Modifier::BOLD),
+            )
             .highlight_symbol(">");
 
         f.render_stateful_widget(sessions, region, &mut self.session_state);
@@ -58,9 +72,7 @@ impl SessionList {
                 .sessions
                 .iter()
                 .cloned()
-                .filter(|x| {
-                    matcher.fuzzy_match(&x.name, search).is_some()
-                })
+                .filter(|x| matcher.fuzzy_match(&x.name, search).is_some())
                 .collect();
 
             self.filtered_sessions
@@ -104,7 +116,7 @@ impl SessionList {
         self.session_state.select(Some(selected));
     }
 
-    fn do_selection(&mut self, action: Action) -> Result<(), Box<dyn Error>>{
+    fn do_selection(&mut self, action: Action) -> Result<(), Box<dyn Error>> {
         if self.session_state.selected().is_some() {
             let selected = self
                 .filtered_sessions
@@ -114,7 +126,7 @@ impl SessionList {
             match action {
                 Action::Select => {
                     if selected.new {
-                        new_session(&selected.name, true);
+                        new_session(&selected.name, true, self.config);
                     } else {
                         attach_session(&selected.name);
                     }
@@ -122,7 +134,7 @@ impl SessionList {
                 Action::Delete => {
                     delete_session(&selected.name);
 
-                    self.sessions = get_sessions()?;
+                    self.sessions = get_sessions(self.config)?;
                     let last = self.last_search.clone();
                     self.filter_sessions(&last);
                 }

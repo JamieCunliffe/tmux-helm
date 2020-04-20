@@ -1,4 +1,6 @@
 use crate::utils::expand_path;
+use crate::theme::Theme;
+
 use serde::Deserialize;
 use std::error::Error;
 use std::fs::read_to_string;
@@ -9,13 +11,16 @@ pub struct Config {
     pub session_files: Vec<String>,
     #[serde(default = "default_session_format")]
     pub session_format: String,
+    #[serde(default = "default_theme")]
+    pub theme: Theme
 }
 
 impl Default for Config {
     fn default() -> Self {
         Config {
             session_files: vec![],
-            session_format: default_session_format()
+            session_format: default_session_format(),
+            theme: default_theme(),
         }
     }
 }
@@ -74,4 +79,8 @@ fn get_config_internal() -> Result<Config, Box<dyn Error>> {
 
 pub fn default_session_format() -> String {
     String::from("#{session_name}")
+}
+
+pub fn default_theme() -> Theme {
+    Theme::default()
 }

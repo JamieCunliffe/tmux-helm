@@ -1,25 +1,28 @@
 use super::event::Event;
 use super::session_list::SessionList;
+use crate::config::Config;
 
 use termion::event::Key;
 
+use std::error::Error;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Layout};
-use tui::style::{Color, Style};
+use tui::style::Style;
 use tui::widgets::{Block, Paragraph, Text};
 use tui::Frame;
-use std::error::Error;
 
-pub struct UI {
-    session_list: SessionList,
+pub struct UI<'a> {
+    session_list: SessionList<'a>,
     current_search: String,
+    config: &'a Config,
 }
 
-impl UI {
-    pub fn new() -> Result<UI, Box<dyn Error>> {
+impl UI<'_> {
+    pub fn new(config: &Config) -> Result<UI, Box<dyn Error>> {
         Ok(UI {
-            session_list: SessionList::new()?,
+            session_list: SessionList::new(config)?,
             current_search: String::from(""),
+            config,
         })
     }
 
@@ -36,9 +39,9 @@ impl UI {
             .split(f.size());
 
         let text = [
-            Text::styled("<C-j>", Style::new().fg(Color::Red)),
+            Text::styled("<C-j>", Style::new().fg(self.config.theme.get_help_binding_foreground())),
             Text::raw(" Switch/Create, "),
-            Text::styled("<C-d>", Style::new().fg(Color::Red)),
+            Text::styled("<C-d>", Style::new().fg(self.config.theme.get_help_binding_foreground())),
             Text::raw(" Delete"),
         ];
 
@@ -49,8 +52,8 @@ impl UI {
         self.session_list.draw(chunks[1], f);
 
         let search_text = [
-            Text::styled("Prompt: ", Style::default().fg(Color::Cyan)),
-            Text::raw(self.current_search.as_str()),
+            Text::styled("Prompt: ", Style::default().fg(self.config.theme.get_prompt_foreground())),
+            Text::styled(self.current_search.as_str(), Style::default().fg(self.config.theme.get_prompt_input_foreground())),
         ];
         let search_text = Paragraph::new(search_text.iter()).block(block).wrap(true);
         f.render_widget(search_text, chunks[2]);

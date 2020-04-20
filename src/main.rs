@@ -18,6 +18,7 @@ mod utils;
 mod event;
 mod session;
 mod session_list;
+mod theme;
 mod tmux;
 mod ui;
 mod session_manager;
@@ -52,7 +53,9 @@ fn main() {
         }
     };
 
-    let mut app = match UI::new() {
+    let config = crate::config::get_config();
+
+    let mut app = match UI::new(&config) {
         Ok(a) => a,
         Err(e) => {
             error!("Failed to setup UI due to error: {}", e);

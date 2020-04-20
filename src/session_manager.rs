@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
+use crate::config::Config;
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -60,11 +61,10 @@ impl Display for Split {
     }
 }
 
-pub fn read_session(session_name: &String) -> Option<Session> {
+pub fn read_session(session_name: &String, config: &Config) -> Option<Session> {
     debug!("Reading sessions");
-    let config = super::config::get_config();
 
-    for session_file in config.session_files {
+    for session_file in &config.session_files {
         let contents = match std::fs::read_to_string(&session_file) {
             Ok(a) => a,
             Err(e) => {
